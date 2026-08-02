@@ -6,6 +6,9 @@ on:
     branches:
       - claude/ios-18-api-1-7-compat-6ip2w9
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: macos-14
@@ -53,3 +56,15 @@ jobs:
           name: appdb-unsigned-ipa
           path: build/appdb-unsigned.ipa
           retention-days: 14
+
+      - name: Publish release with IPA asset
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: unsigned-ipa-run-${{ github.run_number }}
+          name: "appdb unsigned IPA (build ${{ github.run_number }})"
+          body: |
+            Unsigned IPA built from commit ${{ github.sha }} (branch `${{ github.ref_name }}`).
+            No code signature — sign it yourself (e.g. with Feather) before installing.
+          files: build/appdb-unsigned.ipa
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
